@@ -1,12 +1,23 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from students.models import Student
+from .serializers import StudentSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import api_view
 
 # Create your views here.
 
+@api_view(['GET', 'POST'])
 def studentsview(request):
-    students=[
-        {'id': 1, 'name': 'John Doe', 'age': 20},
-        {'id': 2, 'name': 'Jane Smith', 'age': 22},
-        {'id': 3, 'name': 'Sam Brown', 'age': 19}
-    ]
-    return JsonResponse(students, safe=False)
+    if request.method == 'GET':
+        students = Student.objects.all()
+        serializer = StudentSerializer(students, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
