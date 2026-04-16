@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view
 
 # Create your views here.
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', ])
 def studentsview(request):
     if request.method == 'GET':
         students = Student.objects.all()
@@ -22,7 +22,7 @@ def studentsview(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@api_view(['GET', 'PUT', 'DELETE'])
 def studentDetailview(request, pk):
     try:
         student = Student.objects.get(pk=pk)
@@ -37,7 +37,7 @@ def studentDetailview(request, pk):
         serializer = StudentSerializer(student, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
